@@ -181,7 +181,7 @@ function convertDescToGraph(e: EventTarget) {
     console.log(graphSegment)
   } catch (error) {
     console.log(error)
-    ElMessage.error(error.message)
+    ElMessage.error((error as Error).message)
     // handle error
     return
   }
@@ -271,7 +271,7 @@ function convertGraphToDesc() {
       <el-divider />
       <el-main>
         <VueFlow v-model="elements">
-          <Background pattern-color="#aaa" gap="8" />
+          <Background pattern-color="#aaa" :gap="8" />
         </VueFlow>
       </el-main>
     </el-container>
