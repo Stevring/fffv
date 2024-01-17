@@ -37,46 +37,34 @@ class FilterGraphStringParser {
           return ""
       }
       this.p += "sws_flags=".length;
-      let colonP = this.str.indexOf(";", this.p)
-      if (colonP >= this.str.length) {
+      const colonP = this.str.indexOf(";", this.p)
+      if (colonP == -1) {
           throw Error(`Failed to parse sws_flags ${this.str.substring(this.p, colonP)}`)
       }
-      let res = this.str.substring(this.p, colonP)
+      const res = this.str.substring(this.p, colonP)
       this.p = colonP + 1;
       this.skipWhiteSpaces();
       return res;
   }
 
   parseSegment(): FilterSegment {
-    let graphSegment = new FilterSegment()
-    try {
-      graphSegment.scaleSwOpts = this.parseSwsOpts()
-    } catch (error) {
-      throw error
-    }
+    const graphSegment = new FilterSegment()
+    graphSegment.scaleSwOpts = this.parseSwsOpts()
     this.skipWhiteSpaces()
     while (!this.finished()) {
-      try {
-        graphSegment.chains.push(this.parseChain())
-      } catch (error) {
-        throw error
-      }
+      graphSegment.chains.push(this.parseChain())
       this.skipWhiteSpaces()
     }
     return graphSegment
   }
 
   parseChain(): FilterChain {
-      let chain = new FilterChain()
+      const chain = new FilterChain()
       while (!this.finished()) {
-        try {
-          let filter = this.parseFilter()
-          chain.filterParams.push(filter)
-        } catch (error) {
-          throw error
-        }
+        const filter = this.parseFilter()
+        chain.filterParams.push(filter)
         if (!this.finished()) {
-          let c = this.str.charAt(this.p)
+          const c = this.str.charAt(this.p)
           if (c !== "," && c !== ";") {
             throw Error(`Traling unparsed string after a filter: ${this.str.substring(this.p)}`)
           } else {
@@ -90,13 +78,9 @@ class FilterGraphStringParser {
   }
 
   parseFilter(): FilterParams {
-      let f = new FilterParams()
+      const f = new FilterParams()
       // input label
-      try {
-        f.inputPads.push(...this.parseLinkLabels())
-      } catch (error) {
-        throw error
-      }
+      f.inputPads.push(...this.parseLinkLabels())
       // filter name
       let filterNameEndP = this.nextOccurrence([",", ";", "=", "["], this.p)
       if (filterNameEndP == -1) {
@@ -104,7 +88,7 @@ class FilterGraphStringParser {
       }
       let filterName = this.str.substring(this.p, filterNameEndP);
       let instanceName = "";
-      let atP = filterName.indexOf("@");
+      const atP = filterName.indexOf("@");
       if (atP != -1) {
         instanceName = filterName.substring(atP + 1);
         filterName = filterName.substring(0, atP);
@@ -121,7 +105,7 @@ class FilterGraphStringParser {
         ++this.p;
         let optEndP = this.nextOccurrence(["[", "]", ",", ";"], this.p)
         if (optEndP == -1) optEndP = this.str.length
-        let opts = this.str.substring(this.p, optEndP)
+        const opts = this.str.substring(this.p, optEndP)
         console.log(`option ${opts} [${this.p}, ${optEndP}]`)
         this.p = optEndP
         f.opts = opts
@@ -133,14 +117,10 @@ class FilterGraphStringParser {
   }
 
   parseLinkLabels(): FilterPadParams[] {
-    let res = []
+    const res = []
     while(!this.finished() && this.str.startsWith("[", this.p)) {
-      try {
-          let pad = this.parseLinkLabel() as FilterPadParams
-          res.push(pad)
-      } catch (error) {
-          throw error
-      }
+      const pad = this.parseLinkLabel() as FilterPadParams
+      res.push(pad)
     }
     return res
   }
@@ -149,12 +129,12 @@ class FilterGraphStringParser {
       if (!this.str.startsWith("[", this.p)) {
           return null;
       }
-      let secondBracketP = this.str.indexOf("]", this.p)
-      if (secondBracketP >= this.str.length) {
+      const secondBracketP = this.str.indexOf("]", this.p)
+      if (secondBracketP == -1) {
           throw Error(`Failed to Parse link label: ${this.str.substring(this.p, secondBracketP)}`)
       }
       console.log(`filter pad [${this.p + 1}, ${secondBracketP}]`)
-      let pad = new FilterPadParams(this.str.substring(this.p + 1, secondBracketP));
+      const pad = new FilterPadParams(this.str.substring(this.p + 1, secondBracketP));
       this.p = secondBracketP + 1;
       this.skipWhiteSpaces();
       return pad;
@@ -163,7 +143,7 @@ class FilterGraphStringParser {
   // Utils
 
   skipWhiteSpaces(): void {
-      var c = this.str.charAt(this.p);
+      let c = this.str.charAt(this.p);
       while (c === " " || c === "\t" || c === "\n" || c === "\r") {
           c = this.str.charAt(++this.p)
       }

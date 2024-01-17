@@ -6,6 +6,7 @@ import { Background } from '@vue-flow/background'
 import { ref } from 'vue'
 import { ArrowUp, ArrowDown } from '@element-plus/icons-vue'
 import { FilterGraphStringParser, FilterSegment, FilterChain, FilterParams, FilterPadParams} from './GraphParser'
+import { ElMessage } from 'element-plus'
 
 // import SpecialNode from './components/SpecialNode.vue'
 // import SpecialEdge from './components/SpecialEdge.vue'
@@ -147,19 +148,28 @@ function linkFilters(filterParam2Node: Map<FilterParams, FilterNode>, srcFilter:
 }
 
 function calculateLayout(inputNodes: FilterNode[]) {
-  // let top = 0
-  // let left = 0
-  // const yDist = 100
-  // const xDist = 250
+  const ySpace = 100
+  const xSpace = 250
+  console.log(inputNodes)
 
-  // let previousChainBottom = 0
+  let previousChainBottom = 0
 
-  // for (const inputNode of inputNodes) {
-  //   inputNode.position = {x: 0, y: previousChainBottom + yDist} // we start the new input from the bottom of the previous chain
-  //   let nodes = inputNode.outputs
-  //   while (n)
-  // }
+  // return bottom most position
+  function visitNode(node: FilterNode, x: number, y: number): number {
+    node.position = {x: x, y: y}
+    const outputNodes = node.outputs.flatMap((e) => {
+      return e.targetNode === undefined ? [] : e.targetNode
+    })
+    console.log(outputNodes)
+    for (const outputNode of outputNodes) {
+      y = visitNode(outputNode, x + xSpace, y) + ySpace
+    }
+    return outputNodes.length > 0 ? y - ySpace : y
+  }
 
+  for (const inputNode of inputNodes) {
+    previousChainBottom = visitNode(inputNode, 50, previousChainBottom + ySpace)
+  }
 }
 
 function convertDescToGraph(e: EventTarget) {
@@ -171,6 +181,7 @@ function convertDescToGraph(e: EventTarget) {
     console.log(graphSegment)
   } catch (error) {
     console.log(error)
+    ElMessage.error(error.message)
     // handle error
     return
   }
@@ -195,7 +206,6 @@ function convertDescToGraph(e: EventTarget) {
         inputs: Array(filterParam.inputPads.length),
         outputs: Array(filterParam.outputPads.length)
       }
-      filterParam.node = node;
       filter2Node.set(filterParam, node)
     })
   })
