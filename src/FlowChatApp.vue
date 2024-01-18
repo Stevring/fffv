@@ -149,7 +149,7 @@ function linkFilters(filterParam2Node: Map<FilterParams, FilterNode>, srcFilter:
 
 function calculateLayout(inputNodes: FilterNode[]) {
   const ySpace = 100
-  const xSpace = 250
+  const xSpace = 180
   console.log(inputNodes)
 
   let previousChainBottom = 0
@@ -265,7 +265,6 @@ function convertGraphToDesc() {
         </el-row>
         <el-row>
           <el-button type="primary" :icon="ArrowDown" @click="convertDescToGraph" >Convert Description to Graph</el-button>
-          <el-button type="primary" :icon="ArrowUp" @click="convertGraphToDesc" >Convert Graph to Description</el-button>
         </el-row>
       </el-header>
       <el-divider />
